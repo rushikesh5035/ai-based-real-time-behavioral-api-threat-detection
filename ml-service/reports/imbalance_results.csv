@@ -1,0 +1,5 @@
+Technique,Accuracy,Precision,Recall,F1-Score
+Oversampling,1.0,1.0,1.0,1.0
+Undersampling,1.0,1.0,1.0,1.0
+SMOTE,1.0,1.0,1.0,1.0
+SMOTEENN,1.0,1.0,1.0,1.0
