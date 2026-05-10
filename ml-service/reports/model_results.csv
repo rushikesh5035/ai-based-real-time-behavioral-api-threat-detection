@@ -1,0 +1,6 @@
+Model,Accuracy,Precision,Recall,F1-Score
+RandomForest,1.0,1.0,1.0,1.0
+SVM,1.0,1.0,1.0,1.0
+XGBoost,0.9992,0.9989,0.9994,0.9992
+LogisticRegression,0.9992,0.9994,0.9989,0.9992
+NaiveBayes,0.9985,0.9989,0.9978,0.9983
