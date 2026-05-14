@@ -1,8 +1,12 @@
+# Python (ml-service)
+venv/
+env/
+.venv/
 __pycache__/
 *.py[cod]
 *.pyc
+.ipynb_checkpoints/
 .env
 .env.*
-logs/
 .vscode/
-.DS_Store
+.venv/

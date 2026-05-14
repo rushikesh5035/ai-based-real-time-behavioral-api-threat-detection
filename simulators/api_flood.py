@@ -1,14 +1,29 @@
-import requests
+﻿import requests
 
 URL = "http://localhost:3000/api/products"
+RESET_URL = "http://localhost:3000/api/security/reset"
 
-print("🔥 Starting API Flood")
 
-for i in range(500):
+def try_reset() -> None:
+    try:
+        requests.post(RESET_URL, timeout=5)
+    except Exception:
+        pass
+
+
+print("[FLOOD] Starting API flood simulation")
+try_reset()
+
+for i in range(200):
     try:
         response = requests.get(URL, timeout=5)
-        status = response.status_code
-    except Exception as e:
-        status = str(e)
+        body = response.json() if response.headers.get("content-type", "").startswith("application/json") else {}
+        extra = ""
+        if isinstance(body, dict) and body.get("action"):
+            extra = f" | action={body.get('action')} prediction={body.get('prediction')}"
+        print(f"[FLOOD] #{i+1:03d} -> {response.status_code}{extra}")
 
-    print(f"[FLOOD] Request {i+1} ->", status)
+        if response.status_code in (403, 429):
+            break
+    except Exception as exc:
+        print(f"[FLOOD] #{i+1:03d} -> ERROR: {exc}")
