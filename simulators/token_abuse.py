@@ -1,8 +1,8 @@
 """
-API Flood Attack Simulator
-Simulates a volumetric flood attack -- extremely rapid requests to overwhelm the API.
+Token Abuse Attack Simulator
+Simulates a stolen/leaked token being reused across many requests to sensitive endpoints.
 
-Expected escalation: ALLOW (warmup) -> RATE_LIMIT -> BLOCK
+Expected escalation: ALLOW (warmup) -> ALERT (suspicious) -> RATE_LIMIT (escalation) -> BLOCK
 """
 
 import time
@@ -11,33 +11,37 @@ import requests
 BASE_URL = "http://localhost:3001/api"
 RESET_URL = f"{BASE_URL}/security/reset"
 
-TARGET_URL = f"{BASE_URL}/products"
-NUM_REQUESTS = 15
-DELAY = 0.02  # 20ms between requests -- extremely fast flood
+STOLEN_TOKEN = "Bearer leaked-admin-token-xyz"
+ENDPOINTS = ["/profile", "/products", "/profile", "/profile", "/products"]
+NUM_REQUESTS = 20
+DELAY = 0.5  # 500ms -- moderate speed, not a flood but persistent
 
 
 def main():
     print("=" * 70)
-    print("[API FLOOD] Starting flood attack simulation")
-    print(f"[API FLOOD] Target: {TARGET_URL}")
-    print(f"[API FLOOD] Requests: {NUM_REQUESTS} at {DELAY}s interval (50 req/sec)")
+    print("[TOKEN ABUSE] Starting token abuse simulation")
+    print(f"[TOKEN ABUSE] Target: {BASE_URL}")
+    print(f"[TOKEN ABUSE] Requests: {NUM_REQUESTS} reusing same stolen token")
     print("=" * 70)
 
     # Reset security state
     try:
         requests.post(RESET_URL, timeout=3)
-        print("[API FLOOD] Security state reset OK")
+        print("[TOKEN ABUSE] Security state reset OK")
     except Exception:
-        print("[API FLOOD] Could not reset security state (continuing)")
+        print("[TOKEN ABUSE] Could not reset security state (continuing)")
 
     print("-" * 70)
 
     for i in range(1, NUM_REQUESTS + 1):
+        endpoint = ENDPOINTS[i % len(ENDPOINTS)]
+        url = f"{BASE_URL}{endpoint}"
+
         try:
             resp = requests.get(
-                TARGET_URL,
+                url,
                 headers={
-                    "Authorization": "Bearer flood-bot-token",
+                    "Authorization": STOLEN_TOKEN,
                 },
                 timeout=5,
             )
@@ -53,23 +57,23 @@ def main():
             policy = body.get("policy_reason", body.get("message", "-"))
 
             print(
-                f"[FLOOD] #{i:02d} /products -> {resp.status_code} | "
+                f"[TOKEN] #{i:02d} {endpoint:12s} -> {resp.status_code} | "
                 f"action={action:12s} prediction={str(prediction):15s} "
                 f"confidence={confidence}  policy={policy}"
             )
 
             if resp.status_code == 403:
-                print(f"\n[API FLOOD] IP BLOCKED after {i} requests -- flood fully stopped!")
+                print(f"\n[TOKEN ABUSE] IP BLOCKED after {i} requests -- token abuse fully stopped!")
                 break
 
         except requests.exceptions.ConnectionError:
-            print(f"[FLOOD] #{i:02d} Connection failed -- is backend running on port 3001?")
+            print(f"[TOKEN] #{i:02d} Connection failed -- is backend running on port 3001?")
             break
 
         time.sleep(DELAY)
 
     print("-" * 70)
-    print("[API FLOOD] Simulation complete")
+    print("[TOKEN ABUSE] Simulation complete")
 
 
 if __name__ == "__main__":
