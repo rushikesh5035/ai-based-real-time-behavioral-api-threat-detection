@@ -21,7 +21,32 @@ router.get("/profile", (req, res) => {
 router.get("/products", (req, res) => {
   res.json({
     success: true,
-    message: "Products fetched",
+    message: "Products fetched for you",
+  });
+});
+
+router.get("/health", (req, res) => {
+  res.json({
+    success: true,
+    service: "backend",
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+router.get("/security/events", (req, res) => {
+  const limit = Number(req.query.limit || 50);
+
+  res.json({
+    success: true,
+    events: behaviorStore.getEvents(Number.isFinite(limit) ? limit : 50),
+  });
+});
+
+router.get("/security/summary", (req, res) => {
+  res.json({
+    success: true,
+    summary: behaviorStore.getSummary(),
   });
 });
 

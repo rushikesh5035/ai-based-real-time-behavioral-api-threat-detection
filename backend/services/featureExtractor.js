@@ -108,7 +108,9 @@ function extractFeatures(req) {
   const maxTokenUse = tokenCounts.length ? Math.max(...tokenCounts) : 1;
   // Stable definition for early requests: first use is not reuse.
   const tokenReuseRatio =
-    sequenceLength <= 1 ? 0 : (maxTokenUse - 1) / Math.max(1, sequenceLength - 1);
+    sequenceLength <= 1
+      ? 0
+      : (maxTokenUse - 1) / Math.max(1, sequenceLength - 1);
 
   const failedAuthCount = (userData.failedLoginEvents || []).length;
 
