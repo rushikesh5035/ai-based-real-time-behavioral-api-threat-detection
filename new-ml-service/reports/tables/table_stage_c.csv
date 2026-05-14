@@ -1,0 +1,6 @@
+resampling,scaling,model,accuracy,macro_precision,macro_recall,macro_f1
+undersampling,none,RandomForest,0.9983,0.9973,0.9973,0.9973
+oversampling,none,NaiveBayes,0.9975,0.9965,0.9965,0.9965
+undersampling,standard,LogisticRegression,0.9967,0.9958,0.9957,0.9958
+undersampling,none,XGBoost,0.995,0.9929,0.9927,0.9928
+undersampling,standard,SVM,0.9942,0.9917,0.9938,0.9927

@@ -1,0 +1,5 @@
+stage,resampling,model,accuracy,macro_precision,macro_recall,macro_f1
+A_resampling_filter,undersampling,RandomForest,0.9983,0.9973,0.9973,0.9973
+A_resampling_filter,oversampling,RandomForest,0.9967,0.9962,0.9941,0.9951
+A_resampling_filter,none,RandomForest,0.9958,0.9958,0.9925,0.9941
+A_resampling_filter,smote,RandomForest,0.9942,0.9935,0.9895,0.9914

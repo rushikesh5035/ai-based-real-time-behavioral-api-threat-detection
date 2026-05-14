@@ -1,0 +1,20 @@
+Classification Report
+
+              precision    recall  f1-score   support
+
+  bruteforce     0.9862    1.0000    0.9930       214
+       flood     1.0000    0.9947    0.9973       188
+      normal     0.9969    1.0000    0.9984       635
+ token_abuse     1.0000    0.9755    0.9876       163
+
+    accuracy                         0.9958      1200
+   macro avg     0.9958    0.9925    0.9941      1200
+weighted avg     0.9959    0.9958    0.9958      1200
+
+
+Confusion Matrix
+
+[[214   0   0   0]
+ [  1 187   0   0]
+ [  0   0 635   0]
+ [  2   0   2 159]]

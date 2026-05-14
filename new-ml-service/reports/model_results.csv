@@ -1,0 +1,2 @@
+resampling,scaling,model,accuracy,macro_precision,macro_recall,macro_f1
+undersampling,none,RandomForest,0.9983,0.9973,0.9973,0.9973

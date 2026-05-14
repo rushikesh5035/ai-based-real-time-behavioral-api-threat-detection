@@ -1,0 +1,7 @@
+stage,resampling,scaling,model,accuracy,macro_precision,macro_recall,macro_f1
+B_scaling_filter,undersampling,none,RandomForest,0.9983,0.9973,0.9973,0.9973
+B_scaling_filter,undersampling,minmax,RandomForest,0.9983,0.9973,0.9973,0.9973
+B_scaling_filter,undersampling,standard,RandomForest,0.9983,0.9973,0.9973,0.9973
+B_scaling_filter,oversampling,none,RandomForest,0.9967,0.9962,0.9941,0.9951
+B_scaling_filter,oversampling,standard,RandomForest,0.9967,0.9962,0.9941,0.9951
+B_scaling_filter,oversampling,minmax,RandomForest,0.9958,0.995,0.9925,0.9937
