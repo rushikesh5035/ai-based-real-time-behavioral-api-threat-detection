@@ -34,7 +34,7 @@ MODEL_FEATURES = [
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("ml_service")
 
-app = FastAPI(title="API Behavioral Threat Detection Service v2")
+app = FastAPI(title="API Behavioral Threat Detection — ML Inference Service v2")
 
 
 class RequestFeatures(BaseModel):
@@ -53,43 +53,6 @@ class RequestFeatures(BaseModel):
     status_5xx_ratio: float
 
 
-def map_action(label: str) -> str:
-    if label == "normal":
-        return "ALLOW"
-    if label == "token_abuse":
-        return "ALERT"
-    return "BLOCK"
-
-
-def decide_action(label: str, confidence: float | None) -> tuple[str, int | None, str]:
-    # Confidence-aware policy for 4 actions:
-    # ALLOW, ALERT, RATE_LIMIT, BLOCK
-    if confidence is None:
-        return map_action(label), None, "fallback_no_confidence"
-
-    if label == "normal":
-        if confidence >= 0.80:
-            return "ALLOW", None, "normal_high_confidence"
-        return "RATE_LIMIT", 60, "normal_low_confidence"
-
-    if label == "token_abuse":
-        if confidence >= 0.85:
-            return "ALERT", None, "token_abuse_high_confidence"
-        return "RATE_LIMIT", 120, "token_abuse_borderline"
-
-    if label == "flood":
-        if confidence >= 0.90:
-            return "BLOCK", None, "flood_high_confidence"
-        return "RATE_LIMIT", 180, "flood_borderline"
-
-    if label == "bruteforce":
-        if confidence >= 0.90:
-            return "BLOCK", None, "bruteforce_high_confidence"
-        return "RATE_LIMIT", 300, "bruteforce_borderline"
-
-    return "BLOCK", None, "unknown_label_failsafe"
-
-
 @app.get("/health")
 def health() -> dict:
     return {
@@ -102,6 +65,11 @@ def health() -> dict:
 
 @app.post("/predict")
 async def predict(data: RequestFeatures) -> dict:
+    """
+    Pure ML inference endpoint.
+    Accepts behavioral features, returns ONLY the model prediction and confidence.
+    Decision logic (ALLOW/BLOCK/RATE_LIMIT/ALERT) is handled by the backend layer.
+    """
     try:
         df = pd.DataFrame(
             [
@@ -124,26 +92,22 @@ async def predict(data: RequestFeatures) -> dict:
         )
 
         label = str(model.predict(df)[0])
+
         confidence = None
         if hasattr(model, "predict_proba"):
             proba = model.predict_proba(df)[0]
             confidence = float(proba.max())
 
-        action, rate_limit_seconds, policy_reason = decide_action(label, confidence)
         logger.info(
-            "predict_result prediction=%s decision=%s confidence=%s policy_reason=%s",
+            "prediction  class=%s  confidence=%s",
             label,
-            action,
             f"{confidence:.4f}" if confidence is not None else "None",
-            policy_reason,
         )
 
+        # Return ONLY prediction + confidence. No decision, no policy.
         return {
             "prediction": label,
-            "decision": action,
             "confidence": confidence,
-            "rate_limit_seconds": rate_limit_seconds,
-            "policy_reason": policy_reason,
         }
     except Exception as exc:
         logger.exception("prediction_failed error=%s", exc)
